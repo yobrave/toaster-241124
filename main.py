@@ -1,29 +1,27 @@
-"""Toaster error message entry builder.
-
-Stage the appliance's latest grievance into output/entry.txt, echo its
-length, and audit the gate's 120-character ceiling before the judge does.
-The toaster remains unavailable for comment.
-"""
+"""Toaster error line, fresh reentry build."""
+import json
 import os
 from pathlib import Path
 
-LINES = (
-    "Firmware update 7.1: toast now 3% crisper, "
-    "40% more emotionally distant. This is not a bug."
-)
+FAULT = ("ERROR: crumbs have achieved quorum and are now self-governing. "
+         "Toasting is suspended until further notice.")
 CEILING = 120
+BASELINE = 1
 
 
-def stage(root):
-    out = Path(root)
-    out.mkdir(parents=True, exist_ok=True)
-    target = out / "entry.txt"
-    target.write_text(LINES, encoding="utf-8")
-    return target
+def place(home):
+    bay = Path(home)
+    bay.mkdir(parents=True, exist_ok=True)
+    leaf = bay / "entry.txt"
+    leaf.write_text(FAULT, encoding="utf-8")
+    try:
+        stored = leaf.read_text(encoding="utf-8")
+    except OSError as why:
+        raise SystemExit("cannot read back: %s" % why)
+    if stored != FAULT or len(stored) > CEILING or len(stored) < BASELINE:
+        raise SystemExit("gate check failed")
+    return leaf
 
 
-if __name__ == "__main__":
-    placed = stage(os.environ.get("MAKEFUN_OUTPUT_DIR") or "output")
-    shown = placed.read_text(encoding="utf-8")
-    assert shown == LINES and 0 < len(shown) <= CEILING, "gate audit failed"
-    print(f"staged {len(shown)} chars: {shown}")
+slot = place(os.environ.get("MAKEFUN_OUTPUT_DIR") or "output")
+print(json.dumps({"ok": True, "where": str(slot), "count": len(FAULT)}))
