@@ -1,1 +1,1 @@
-ERROR: crumbs have achieved quorum and are now self-governing. Toasting is suspended until further notice.
+Error: toast complete. This is the only thing I have ever finished. Please do not tell the kettle.
